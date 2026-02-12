@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Hackathon Suite">
+
+    <test name="Amazon Tests">
+        <classes>
+            <class name="com.selenium.testCases.CollectionsTest"/>
+            <class name="com.selenium.testCases.FiltersTest"/>
+            <class name="com.selenium.testCases.GiftCardFiltersTest"/>
+        </classes>
+    </test>
+
+</suite>
