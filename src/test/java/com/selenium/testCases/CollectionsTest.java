@@ -9,9 +9,6 @@ public class CollectionsTest extends BaseTest {
 
     @Test
     public void testCollectionOptions() {
-        HomePage home = new HomePage(driver);
-
-        home.openAmazon();
         CollectionsPage cp = new CollectionsPage(driver);
         cp.displayCollection();
     }

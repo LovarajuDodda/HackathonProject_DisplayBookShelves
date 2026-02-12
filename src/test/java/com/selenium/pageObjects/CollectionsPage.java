@@ -8,14 +8,13 @@ import java.util.List;
 
 public class CollectionsPage extends BasePage{
 
-    @FindBy(xpath = "//select[@id='searchDropdownBox']")
+    @FindBy(xpath = "//select[@id='searchDropdownBox']/option")
     List<WebElement> collectionOptions;
 
     public CollectionsPage(WebDriver driver) {
         super(driver);
     }
 
-    // Method to display collection options
     public void displayCollection() {
         for (WebElement option : collectionOptions) {
             System.out.println(option.getText());

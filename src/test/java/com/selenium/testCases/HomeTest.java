@@ -11,6 +11,5 @@ public class HomeTest extends BaseTest {
         HomePage home = new HomePage(driver);
 
         home.openAmazon();
-        home.searchAmazon("open bookshelves");
     }
 }

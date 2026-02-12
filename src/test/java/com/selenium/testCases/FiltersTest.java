@@ -13,14 +13,9 @@ public class FiltersTest extends BaseTest {
         HomePage homePage = new HomePage(driver);
         FiltersPage filtersPage = new FiltersPage(driver);
 
-        // Test flow
-        homePage.openAmazon();
         homePage.searchAmazon("open bookshelves");
         filtersPage.setSliderToPrice(15000);   // simplified slider method
         filtersPage.setOutOfStock();
         filtersPage.displayFirstThreeItems();
-
-        // Quit driver at the end
-        driver.quit();
     }
 }
