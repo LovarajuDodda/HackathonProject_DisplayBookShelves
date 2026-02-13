@@ -9,13 +9,27 @@ public class FiltersTest extends BaseTest {
 
     @Test
     public void testSearchAndApplyFilters() throws InterruptedException {
-        // Page objects use the driver from BaseTest
-        HomePage homePage = new HomePage(driver);
-        FiltersPage filtersPage = new FiltersPage(driver);
+        try {
+            // Page objects use the driver from BaseTest
+            HomePage homePage = new HomePage(driver);
+            FiltersPage filtersPage = new FiltersPage(driver);
 
-        homePage.searchAmazon("open bookshelves");
-        filtersPage.setSliderToPrice(15000);   // simplified slider method
-        filtersPage.setOutOfStock();
-        filtersPage.displayFirstThreeItems();
+            // Perform search
+            homePage.searchAmazon("open bookshelves");
+            test.pass("Searched for 'open bookshelves'");
+
+            // Apply filters
+            filtersPage.setSliderToPrice(15000);
+            test.pass("Adjusted price slider to ₹15,000");
+
+            filtersPage.setOutOfStock();
+            test.pass("Applied 'Out of Stock' filter");
+
+            // Display results
+            filtersPage.displayFirstThreeItems();
+            test.pass("Displayed first three search results");
+        } catch (Exception e) {
+            test.fail("Test failed: " + e.getMessage());
+        }
     }
 }

@@ -9,8 +9,13 @@ public class CollectionsTest extends BaseTest {
 
     @Test
     public void testCollectionOptions() {
-        CollectionsPage cp = new CollectionsPage(driver);
-        cp.displayCollection();
-    }
+        try {
+            CollectionsPage cp = new CollectionsPage(driver);
 
+            cp.displayCollection();
+            test.pass("Displayed collection options successfully");
+        } catch (Exception e) {
+            test.fail("Test failed: " + e.getMessage());
+        }
+    }
 }

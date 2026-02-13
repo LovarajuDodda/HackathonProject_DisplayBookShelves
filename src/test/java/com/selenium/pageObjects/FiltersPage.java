@@ -42,7 +42,7 @@ public class FiltersPage extends BasePage {
     }
 
     // Adjust price slider to target price
-    public void setSliderToPrice(int targetPrice) {
+    public void setSliderToPrice(int targetPrice) throws InterruptedException {
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         int min = Integer.parseInt(priceSlider.getAttribute("min"));
@@ -67,12 +67,14 @@ public class FiltersPage extends BasePage {
                 }
             }
         }
+
+        Thread.sleep(5000);
     }
 
     // Apply "Out of Stock" filter
-    public void setOutOfStock() {
+    public void setOutOfStock() throws InterruptedException {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", availabilitySection);
-
+        Thread.sleep(5000);
         // Click the "Out of Stock" filter
         outOfStockFilter.click();
 
@@ -80,9 +82,9 @@ public class FiltersPage extends BasePage {
     }
 
     // Display first three search results
-    public void displayFirstThreeItems() {
+    public void displayFirstThreeItems() throws InterruptedException {
         // Scroll down a bit to ensure results are visible
-        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0, 200)");
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0, 150)");
 
         // Explicit wait for search results to be present
         wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(
@@ -96,6 +98,7 @@ public class FiltersPage extends BasePage {
             String price = productPrices.size() > i ? productPrices.get(i).getText() : "Price not available";
             System.out.println((i + 1) + ". " + title + " - " + price);
         }
+        Thread.sleep(2000);
     }
 
 

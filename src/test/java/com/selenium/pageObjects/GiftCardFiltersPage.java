@@ -40,17 +40,19 @@ public class GiftCardFiltersPage extends BasePage {
         super(driver);
     }
 
-    public void searchGiftCard(String query){
+    public void searchGiftCard(String query) throws InterruptedException {
         searchBox.sendKeys(query);
         searchButton.click();
+        Thread.sleep(5000);
     }
 
-    public void applyFiltersAndClickCard() {
+    public void applyFiltersAndClickCard() throws InterruptedException {
         weddingGiftCard.click();
         eGiftCard.click();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.elementToBeClickable(firstGiftCard));
         firstGiftCard.click();
+        Thread.sleep(5000);
     }
 
     public void selectEmailDelivery(String mail) {
