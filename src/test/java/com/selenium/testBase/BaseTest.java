@@ -6,11 +6,16 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Duration;
+import java.util.Properties;
 
 public class BaseTest {
     // 1. Make driver static so it is shared by all test classes
     protected static WebDriver driver;
+    public Properties p;
 
     // 2. Run this once before the entire Suite starts
     @BeforeSuite
@@ -23,9 +28,12 @@ public class BaseTest {
 
     // 3. Run this before EVERY @Test method to ensure we are on the homepage
     @BeforeMethod
-    public void goToHome() {
+    public void goToHome() throws IOException {
+        FileReader file=new FileReader("./src//test//resources//config.properties");
+        p=new Properties();
+        p.load(file);
         if (driver != null) {
-            driver.get("https://www.amazon.in/");
+            driver.get(p.getProperty("URL"));
         }
     }
 
