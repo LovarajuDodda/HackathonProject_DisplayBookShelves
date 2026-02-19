@@ -1,9 +1,10 @@
 package com.selenium.testBase;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
-import Utilities.ConfigReader;   // your utility package
+import Utilities.ConfigReader;
+import Utilities.ExtentReportUtility;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -11,83 +12,99 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 
 public class BaseTest {
     protected static WebDriver driver;
-    protected static ExtentReports extent;
-    protected static ExtentTest test;
+    protected static Logger logger;
 
-    @BeforeSuite
-    @Parameters({"browser"})
-    public void setUpSuite(@Optional("chrome") String browser) {
-        // Browser from XML
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
+        try { Files.createDirectories(Path.of("reports/screenshots")); } catch (Exception ignored) {}
+        try { Files.createDirectories(Path.of("logs/tests")); } catch (Exception ignored) {}
+
+        // Initialize report once
+        ExtentReportUtility.initReport();
+
+        // Create logger for this class
+        logger = LogManager.getLogger(getClass());
+        String browser=ConfigReader.get("browser");
+        // Browser
         switch (browser.toLowerCase()) {
-            case "chrome":
-                driver = new ChromeDriver();
-                break;
-            case "firefox":
-                driver = new FirefoxDriver();
-                break;
-            case "edge":
-                driver = new EdgeDriver();
-                break;
-            default:
-                throw new RuntimeException("Unsupported browser: " + browser);
+            case "chrome":  driver = new ChromeDriver();  break;
+            case "firefox": driver = new FirefoxDriver(); break;
+            case "edge":    driver = new EdgeDriver();    break;
+            default: throw new RuntimeException("Unsupported browser: " + browser);
         }
 
         driver.manage().deleteAllCookies();
         driver.manage().timeouts().implicitlyWait(
-                Duration.ofSeconds(Integer.parseInt(ConfigReader.get("implicitWait")))
-        );
+                Duration.ofSeconds(Integer.parseInt(ConfigReader.get("implicitWait"))));
         driver.manage().window().maximize();
 
-        // ExtentReports setup
-        ExtentSparkReporter spark = new ExtentSparkReporter(ConfigReader.get("reportPath"));
-        spark.config().setDocumentTitle("Automation Report");
-        spark.config().setReportName("Selenium Test Results");
-
-        extent = new ExtentReports();
-        extent.attachReporter(spark);
+        logger.info("==== Suite started. Browser: {} ====", browser);
     }
 
-    @BeforeMethod
-    public void startTest(Method method) {
-        test = extent.createTest(method.getName(), "Executing test: " + method.getName());
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod(Method method) {
+        String testName = method.getName();
 
-        if (driver != null) {
-            driver.get(ConfigReader.get("baseUrl"));
+        // Set per-test context (used by RoutingAppender)
+        ThreadContext.put("testName", testName);
+
+        // Start Extent test
+        ExtentReportUtility.startTest(testName, "Executing test: " + testName);
+        ExtentReportUtility.logInfo("Starting test: " + testName);
+
+        // Navigate to base URL
+        String baseUrl = ConfigReader.get("baseUrl");
+        if (driver != null && baseUrl != null && !baseUrl.isBlank()) {
+            driver.get(baseUrl);
+            logger.info("Navigated to base URL: {}", baseUrl);
         }
+
+        logger.info("==== Test START: {} ====", testName);
     }
 
-    @AfterMethod
-    public void captureFailure(ITestResult result) {
-        if (result.getStatus() == ITestResult.FAILURE) {
-            try {
-                File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-                String path = ConfigReader.get("screenshotPath") + result.getName() + ".png";
-                Files.copy(screenshot.toPath(), new File(path).toPath());
-                test.fail("Test failed: " + result.getThrowable().getMessage());
-                test.addScreenCaptureFromPath(path);
-            } catch (IOException e) {
-                test.fail("Failed to capture screenshot: " + e.getMessage());
-            }
+    @AfterMethod(alwaysRun = true)
+    public void afterMethod(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+
+        switch (result.getStatus()) {
+            case ITestResult.SUCCESS:
+                logger.info("Test PASSED: {}", testName);
+                ExtentReportUtility.logPass("Test passed: " + testName);
+                break;
+
+            case ITestResult.FAILURE:
+                logger.error("Test FAILED: {} | Error: ", testName, result.getThrowable());
+                ExtentReportUtility.logFail("Test failed: " + testName + " | Error: " +
+                        (result.getThrowable() != null ? result.getThrowable().getMessage() : "Unknown error"));
+                break;
+
+            case ITestResult.SKIP:
+                logger.warn("Test SKIPPED: {}", testName);
+                ExtentReportUtility.logSkip("Test skipped: " + testName);
+                break;
+
+            default:
+                logger.info("Test finished with status: {} ({})", testName, result.getStatus());
         }
+
+        // Clear per-test MDC to avoid leaking to next test
+        ThreadContext.clearMap();
     }
 
-    @AfterSuite
-    public void tearDownSuite() {
+    @AfterSuite(alwaysRun = true)
+    public void afterSuite() {
+        logger.info("==== Suite finished ====");
         if (driver != null) {
             driver.quit();
+            logger.info("Driver quit successfully");
         }
-        if (extent != null) {
-            extent.flush();
-        }
+        ExtentReportUtility.flushReport();
     }
 }

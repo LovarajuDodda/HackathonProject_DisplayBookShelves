@@ -24,7 +24,7 @@ public class GiftCardFiltersPage extends BasePage {
     @FindBy(xpath = "//span[text()='eGift Cards']")
     WebElement eGiftCard;
 
-    @FindBy(xpath = "(//div[@role='listitem'])[1]")
+    @FindBy(xpath = "(//div[@data-component-type='s-search-result' and not(contains(@class,'AdHolder'))])[1]")
     WebElement firstGiftCard;
 
     @FindBy(id = "gc-delivery-mechanism-button-Email-announce")

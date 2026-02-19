@@ -1,34 +1,50 @@
 package com.selenium.pageObjects;
 
 import Utilities.ConfigReader;
-import com.selenium.testBase.BaseTest;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import java.util.List;
 
 public class HomePage extends BasePage {
 
-    // Constructor passes WebDriver to BasePage
     public HomePage(WebDriver driver) {
         super(driver);
     }
 
-    // Locate the search box
     @FindBy(xpath = "//input[@id='twotabsearchtextbox']")
     private WebElement searchBox;
 
-    // Locate the search button
     @FindBy(xpath = "//input[@id='nav-search-submit-button']")
     private WebElement searchButton;
 
-    // Navigate to Amazon homepage
+    @FindBy(css = "span.a-color-state, span.a-color-base.a-text-bold")
+    private List<WebElement> resultsHeaders;
+
+    @FindBy(css = ".s-main-slot .s-result-item")
+    private List<WebElement> filteredContent;
+
+    @FindBy(css = "h1, h2, [data-testid='gc-title']")
+    private List<WebElement> detailsHeader;
+
     public void openAmazon() {
-        driver.get((ConfigReader.get("baseUrl")));
+        driver.get(ConfigReader.get("baseUrl"));
     }
 
-    // Perform a search on Amazon
     public void searchAmazon(String query) {
         searchBox.sendKeys(query);
         searchButton.click();
+    }
+
+    public boolean isResultsHeaderDisplayed() {
+        return !resultsHeaders.isEmpty();
+    }
+
+    public boolean isShowingFilteredContent(){
+        return !filteredContent.isEmpty();
+    }
+
+    public boolean isHeaderVisible(){
+        return !detailsHeader.isEmpty();
     }
 }
