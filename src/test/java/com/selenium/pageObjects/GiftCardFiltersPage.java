@@ -18,7 +18,7 @@ public class GiftCardFiltersPage extends BasePage {
     WebElement searchButton;
 
 
-    @FindBy(xpath = "//span[text()='Wedding']")
+    @FindBy(xpath = "//span[text()='Wedding' or text()='Birthday']")
     WebElement weddingGiftCard;
 
     @FindBy(xpath = "//span[text()='eGift Cards']")
