@@ -261,7 +261,7 @@ public class ExtentReportUtility {
                 extent.attachReporter(reporter);
 
                 // System info
-                extent.setSystemInfo("Tester", "Manasa");
+                extent.setSystemInfo("Tester", "Lovaraju");
                 extent.setSystemInfo("OS", System.getProperty("os.name"));
                 extent.setSystemInfo("Java Version", System.getProperty("java.version"));
                 extent.setSystemInfo("Environment", "QA");
